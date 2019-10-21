@@ -9,9 +9,12 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <dirent.h>
+#include <stdlib.h>
 
 #include <UsbSerial.h>
 #include <App.h>
+#include <Usb.h>
 #include <ustring.h>
 //#include <uexcept.h>
 
@@ -54,6 +57,42 @@ vector<CUsbSerial::SDeviceEntry> CUsbSerial::GetDevicesList(string Type)
 	}
 
 	return Result;
+}
+
+int CUsbSerial::GetDevNum(const string& ttyDev)
+{
+	struct dirent *entry;
+	string SysBusPath = "/sys/bus/usb/devices";
+	DIR *dir = opendir(SysBusPath.c_str());
+
+	if (dir == NULL) {
+		closedir(dir);
+		return -1;
+	}
+
+	while ((entry = readdir(dir)) != NULL) {
+		string Device = string(entry->d_name);
+		if (Device == "." || Device == "..")
+			continue;
+
+		string Path = SysBusPath + "/" + Device + "/";
+		string Result = CApp::Exec("find " + Path + " -name ttyUSB2");
+		if (Result.empty())
+			continue;
+
+		if (CUsb::GetDeviceClass(Path) != "00")
+			continue;
+
+		string DevNumFile = Path + "devnum";
+		if (!CApp::FileExists(DevNumFile))
+			return -1;
+
+		closedir(dir);
+		return atoi(CApp::Exec("cat " + DevNumFile).c_str());
+	}
+	closedir(dir);
+
+	return -1;
 }
 
 int CUsbSerial::InitPort(std::string ttyDev, speed_t speed, bool bExclusive, struct termios *ptty)

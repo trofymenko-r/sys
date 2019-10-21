@@ -27,7 +27,7 @@ public:
 
 public:
 	static std::vector<SDeviceEntry> GetDevicesList(std::string Type = "");
-	//static int InitPort(std::string Port, speed_t speed);
+	static int GetDevNum(const std::string& ttyDev);
 	static int InitPort(std::string ttyDev, speed_t speed, bool bExclusive = false, struct termios *ptty = nullptr);
 };
 
