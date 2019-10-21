@@ -19,6 +19,8 @@
 #include <iterator>
 #include <map>
 #include <string.h>
+#include <sys/stat.h>
+#include <pwd.h>
 
 #include "App.h"
 #include "ustring.h"
@@ -125,6 +127,15 @@ bool CApp::FileExists(const string &FileName)
 }
 
 /******************************************************************************/
+/*  PathExists                                                                */
+/******************************************************************************/
+bool CApp::PathExists(const string &Path)
+{
+  struct stat buffer;
+  return (stat(Path.c_str(), &buffer) == 0);
+}
+
+/******************************************************************************/
 /*  DynKernelModuleExists                                                     */
 /******************************************************************************/
 bool CApp::DynKernelModuleExists(const string &ModuleName)
@@ -207,6 +218,16 @@ string CApp::GetCurrentDir()
    cCurrentPath[sizeof(cCurrentPath) - 1] = '\0'; /* not really required */
 
    return(string(cCurrentPath));
+}
+
+/******************************************************************************/
+/*  GetHomeDir                                                                */
+/******************************************************************************/
+string CApp::GetHomeDir()
+{
+	struct passwd *pw = getpwuid(getuid());
+
+	return string(pw->pw_dir) + "/";
 }
 
 /******************************************************************************/

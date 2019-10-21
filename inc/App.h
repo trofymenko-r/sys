@@ -65,8 +65,10 @@ public:
    static string Exec(const string& sCmd, bool bOutResult);
    static string ExecBash(const string& sCmd);
    static bool FileExists(const string &FileName);
+   static bool PathExists(const string &Path);
    static bool DynKernelModuleExists(const string &ModuleName);
    static string GetCurrentDir();
+   static string GetHomeDir();
    static void AssignThreadToCore(int core_id);
    static U64 Rdtsc(void);
    static int FindProcess(const string sName);
